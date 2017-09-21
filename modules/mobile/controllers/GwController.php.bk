@@ -1,0 +1,509 @@
+<?php
+
+class GwController extends MController
+{
+     public function actionGetGwHomeTab()
+    {
+        $res=array();
+	$station_id = isset($_REQUEST['stationId'])?$_REQUEST['stationId']:STATIONID;
+        //$sql = "select a.id as gid,a.title,a.pic_true as ico_true,a.pic_false as ico_false,a.pic_three as ico_three,a.focus from yd_ver_screen_guide as a where a.gid in (32,9) order by a.`order`";
+        $sql = "select a.id as gid,a.title,a.pic_true as ico_true,a.pic_false as ico_false,a.pic_three as ico_three,a.focus from yd_ver_screen_guide as a where a.gid=$station_id order by a.`order`";
+        $sql_res = SQLManager::queryAll($sql);
+    	$logo_sql = "select logo from yd_ver_station where id=$station_id";
+        $logo_res = SQLManager::queryRow($logo_sql);
+        if(!empty($sql_res) && !empty($logo_res)){
+            $res['logo'] = $logo_res['logo'];
+            $res['tabs'] = $sql_res;
+            $err = 0;
+        }else{
+            $err = 1;
+        }
+        $res['err']=$err;
+        echo json_encode($res);
+    }
+
+     public function actionGetGwDetail()
+   {
+        $cacheId = 'getGwDetail'.'?cid='.$_REQUEST['cid'].'&type='.$_REQUEST['type'];
+        $value=Yii::app()->cache->get($cacheId);
+        if($value===false) {
+            // 因为在缓存中没找到 $value ，重新生成它 ，
+            // 并将它存入缓存以备以后使用：
+            // Yii::app()->cache->set($id,$value);
+            $err = 0;
+            if (empty($_REQUEST['cid']) || empty($_REQUEST['type']) ) $err = 1;
+            if($err==0){
+                $vid = $_REQUEST['cid'];
+                $type = $_REQUEST['type'];
+                /*$pro = $_REQUEST['pro'];
+                $city = $_REQUEST['city'];
+                $cp = $_REQUEST['cp'];
+                $usergroup = $_REQUEST['usergroup'];
+                $epgcode = $_REQUEST['epgcode'];*/
+//                $tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+                $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+                $gw_res = SQLManager::queryRow($gw_sql);
+                $list = VerGuideManager::getStationList($gw_res['name']);
+                $tmp = VideoManager::getGwDetail($vid,$type,$list);
+                $res['content']=$tmp;
+            }
+            $res['err']=$err;
+            $value = $res;
+            Yii::app()->cache->set($cacheId, $value, 60);
+	    echo json_encode($res);	
+        }else{
+	    echo json_encode($value);
+        }
+
+    }	
+
+  
+    public function actionGetGwDetailTest()
+   {
+        $cacheId = 'getGwDetailTest'.'?cid='.$_REQUEST['cid'].'&type='.$_REQUEST['type'];
+	$value=Yii::app()->cache->get($cacheId);
+	//var_dump($value);die;
+	if($value===false) {
+            // 因为在缓存中没找到 $value ，重新生成它 ，
+            // 并将它存入缓存以备以后使用：
+            // Yii::app()->cache->set($id,$value);
+            $err = 0;
+            if (empty($_REQUEST['cid']) || empty($_REQUEST['type']) ) $err = 1;
+            if($err==0){
+                $vid = $_REQUEST['cid'];
+                $type = $_REQUEST['type'];
+                /*$pro = $_REQUEST['pro'];
+                $city = $_REQUEST['city'];
+                $cp = $_REQUEST['cp'];
+                $usergroup = $_REQUEST['usergroup'];
+                $epgcode = $_REQUEST['epgcode'];*/
+//                $tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+                $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+                $gw_res = SQLManager::queryRow($gw_sql);
+                $list = VerGuideManager::getStationList($gw_res['name']);
+                $tmp = VideoManager::getGwDetail($vid,$type,$list);
+                $res['content']=$tmp;
+            }
+            $res['err']=$err;
+            $value = $res;  	
+            Yii::app()->cache->set($cacheId, $value, 10);
+	    echo json_encode($res);	
+        }else{
+	    echo json_encode($value);
+	}
+    }
+
+    public function actionGwClassifyDataTextVersion()
+    {
+        //$cacheId = 'ClassifyData'.'?cid='.$_REQUEST['cid'].'&p='.$_REQUEST['p'];
+        $cacheId = 'gwClassifyData' . '?cid=' . $_REQUEST['cid'];
+        $value = Yii::app()->cache->get($cacheId);
+        if ($value === false) {
+            // 因为在缓存中没找到 $value ，重新生成它 ，
+            // 并将它存入缓存以备以后使用：
+            // Yii::app()->cache->set($id,$value);
+            $err = 0;
+            if (empty($_REQUEST['cid'])) $err = 1;
+            if ($err == 0) {
+                $gid = $_REQUEST['cid'];
+                $tmp = VerSiteListManager::getGwSiteListTextVersion($gid);
+                $res = $tmp;
+            }
+            $res['err'] = $err;
+            $value = $res;
+            Yii::app()->cache->set($cacheId, $value, 60);
+            echo json_encode($res);
+        } else {
+            echo json_encode($value);
+        }
+    }
+
+
+    public function actionGwSearchIndex()
+    {
+        $res = array();
+        $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+        $gw_res = SQLManager::queryRow($gw_sql);
+        $list = VerSiteListManager::getStationList($gw_res['name']);
+        $res['list'] = VideoManager::getSomeContent($list);
+        $row = 4;
+        $res['movie'] = VideoManager::getMovie($list,$row);
+        if(!empty($res['list']) && !empty($res['movie'])){
+            $err = 0;
+            $res['err'] = $err;
+        }else{
+            $res['err'] = 1;
+            $res['list'] = null;
+            $res['movie'] = null;
+        }
+        echo json_encode($res);
+    }
+
+     public function actionGwInitialsSearch()
+    {
+        $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+        $gw_res = SQLManager::queryRow($gw_sql);
+        $list = VerSiteListManager::getStationList($gw_res['name']);
+        $initial = !empty($_REQUEST['initials'])?$_REQUEST['initials']:'';
+        $showType = !empty($_REQUEST['showType'])?$_REQUEST['showType']:'';
+        if($showType == '全部' ){
+            $showType = '';
+        }
+        $title = !empty($_REQUEST['title'])?$_REQUEST['title']:'';
+        $res = array();
+        $res = VideoManager::initialSearch($initial,$showType,$title,$list);
+        echo json_encode($res);
+    }	
+    
+   public function actionGwTitleSearch()
+    {
+        $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+        $gw_res = SQLManager::queryRow($gw_sql);
+        $p = !empty($_REQUEST['p'])?$_REQUEST['p']:'1';
+        $list = VerSiteListManager::getStationList($gw_res['name']);
+        $initial = !empty($_REQUEST['initials'])?$_REQUEST['initials']:'';
+        $showType = !empty($_REQUEST['showType'])?$_REQUEST['showType']:'';
+        if($showType == '全部' ){
+            $showType = '';
+        }
+        $res = array();
+        $res = VideoManager::titleSearch($initial,$showType,$list,$p);
+        echo json_encode($res);
+    }
+	
+   public function actionGwHomeSearch()
+    {
+        $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+        $gw_res = SQLManager::queryRow($gw_sql);
+        $row = 6;   //取多少条数据
+        $list = VerSiteListManager::getStationList($gw_res['name']);
+        $res['movie'] = VideoManager::getMovie($list,$row);
+        if(!empty($res['movie'])){
+            $res['err'] = 0;
+        }else{
+            $res['err'] = 1;
+        }
+        echo json_encode($res);
+    }
+
+   public function actionGwFiltData()
+    {
+        $err = 0;
+        if (empty($_REQUEST['cid'])) $err = 1;
+        if($err==0){
+            $cid = $_REQUEST['cid'];
+            $country = $_REQUEST['country'];
+            $year = $_REQUEST['year'];
+            $p = $_REQUEST['p'];
+            $tmp = VerSiteListManager::getGwFiltData($cid,$country,$year,$p);
+            $res = $tmp;
+        }
+        $res['err']=$err;
+        echo json_encode($res);
+    }
+
+    public function actionGwFilter()
+    {
+        $err = 0;
+        if (empty($_REQUEST['cid'])) $err = 1;
+        if($err==0){
+            $cid = $_REQUEST['cid'];
+            $tmp = VerSiteListManager::getGwFilter($cid);
+            $res['tab']=$tmp;
+        }
+        $res['err']=$err;
+        echo json_encode($res);
+    }
+    	
+    public function actionGetGwWallPaper()
+    {
+        $list = array();
+        $gid=STATIONID;
+        $tmp = VerWallManager::getGwData($gid);
+        if (!empty($tmp)) {
+            $err = 0;
+            foreach ($tmp as $val) {
+                $list[] = $val;
+            }
+        } else {
+            $err = 1;
+        }
+	$res['err'] = $err;
+        $res['walls'] = $list;
+        echo json_encode($res);
+    } 
+
+    public function actionGwMsgContent()
+    {
+        $err = 0;
+        $gid=STATIONID;
+        $tmp = MessageManager::getGwMsgData($gid);
+        $res['content']=$tmp;
+        if(!empty($res['content'])){
+            $err = 0;
+        }else{
+            $err =1;
+        }
+        $res['err']=$err;
+        echo json_encode($res);
+    }
+
+    //公网盒子2.0版本详情页接口，上半部分内容
+    public function actionGetGwDetailPageInfoTop()
+    {
+        $vid  = $_REQUEST['cid'];
+        if(empty($vid) ){
+            $err = 1;
+            $res['err'] = $err;
+            echo json_encode($res);
+            return;
+        }
+//        $gw_sql = "select name from yd_ver_station where id=32";
+//        $gw_res = SQLManager::queryRow($gw_sql);
+//        $list = VerGuideManager::getStationList($gw_res['name']);
+//        $tmp = VideoManager::getGwDetailPageInfo($vid,$list);
+        $res = array();
+        $sql = "select a.score,a.id,a.type,a.vid as cid,a.title,b.duration as length,a.year,a.director,a.actor as star,a.info as introduction,a.keyword as lable,a.language,a.CountryOfOrigin as state,a.simple_set,a.region , a.spid,a.mms_id,a.targetgroupassetid as ParentNodeID,a.ShowType, b.cp,b.assetId,b.mediafilepath as url,b.contid as ProgramID from yd_video as a left join yd_video_list as b on a.vid=b.vid where a.vid='$vid' group by b.vid order by b.mediacoderate desc";
+        $tmp = SQLManager::queryRow($sql);
+	
+        if(!empty($tmp)) {
+            if($tmp['length'] == ""){
+		$tmp['length'] = 0;
+	   }
+	
+	    if ($tmp['state'] == '0') {
+                $tmp['state'] = '其他';
+            } else if ($tmp['state'] == '1') {
+                $tmp['state'] = '内地';
+            } else if ($tmp['state'] == '2') {
+                $tmp['state'] = '港台';
+            } else if ($tmp['state'] == '3') {
+                $tmp['state'] = '韩日';
+            } else if ($tmp['state'] == '4') {
+                $tmp['state'] = '欧美';
+            } else if ($tmp['state'] == '5') {
+                $tmp['state'] = '东南亚';
+            } else if ($tmp['state'] == '99' || $tmp['state'] == '100') {
+                $tmp['state'] = '其他';
+            } else {
+                $tmp['state'] = $tmp['region'];
+            }
+	    if($tmp['ShowType'] == 'Variety'){
+		$tmp['simple_set']=3;
+	    }	
+            $lable = $tmp['lable'];
+            $pa = "/^[\d,']+$/";
+            preg_match($pa, $lable, $match);
+            $tmp['lable'] = array();
+            if (!empty($match)) {
+                $str = KeyWordManager::getKey($lable);
+                $str[0]['type'] = $tmp['type'];
+                $tmp['lable'] = $str;
+            }
+        }
+        $res['err'] = 0;
+        $sqlpic = "select p.url,e.end from yd_video_pic p inner join yd_video_extra e on e.vid=p.vid and p.vid='$vid' and type=1";
+        $pic=SQLManager::queryRow($sqlpic);
+        $tmp['pic']=$pic['url'];
+        $tmp['end']=$pic['end'];
+
+        $res['content'] = $tmp;
+	if(!empty($tmp['simple_set'])){
+            if($tmp['simple_set'] == '1' /*&& $tmp['ShowType'] == 'Movie'*/){
+                $sql_episode = "select v.title, v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid  where (v.vid='$vid' or targetgroupassetid='$vid') and l.flag=1 group by l.assetId order by l.mediacoderate desc";
+            }else if($tmp['simple_set'] == '2' || $tmp['simple_set'] == '3'){
+                $sql_episode = "select v.title,v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid where v.targetgroupassetid='$vid' and v.delFlag=1 and l.flag=1 group by l.assetId order by v.order, l.mediacoderate desc";
+            }
+//        echo $sql_episode;die;
+          $episode= SQLManager::queryAll($sql_episode);
+       }
+       if(!empty($episode)){
+            foreach($episode as $k=>$v){
+                $data['episode'][$k]=$v;
+                $data['episode'][$k]['url']=ltrim($v['url'],'/');
+                $data['episode'][$k]['pid']='';
+                $len = strlen($v['cTime']);
+                $addLen = 8-$len;
+                $tmp_str = '';
+                for($i = 0 ; $i<$addLen/2; $i++){
+                    $tmp_str .='01';
+                }
+                $unixTime = $v['cTime'].$tmp_str;
+                $data['episode'][$k]['cTime']=strtotime($unixTime);
+            }
+        }else{
+            $data['episode']=array();
+        }
+        $data['total']=count($data['episode']);
+        if(empty($data['total'])){
+            $data['total']=1;
+        }
+        $res = array_merge($res,$data);
+        echo json_encode($res);
+
+    }
+
+    //公网盒子获取收藏信息后查询详细信息接口
+    public function actionGwSelectCollectionForward()
+    {
+	$vids = $_REQUEST['vids'];
+	$keys = $_REQUEST['keys'];
+	$keys = explode(",",$keys); 
+	$arr_vids = explode(",",$vids); 
+	$sort_arr = array_combine($keys,$arr_vids);
+//	var_dump($sort_arr);die;
+        //$sql = "select a.vid,a.title,a.targetgroupassetid,b.url from yd_video as a left join yd_video_pic as b on a.vid=b.vid where a.vid in ($vids)  and b.type=1"; //and b.type=1
+        //$sql = "select a.vid,a.title,a.targetgroupassetid,b.url from yd_video as a left join yd_video_pic as b on a.vid=b.vid where a.vid in ($vids) group by a.vid"; //and b.type=1
+        $sql = "select a.vid,a.title,a.targetgroupassetid  from yd_video as a  where a.vid in ($vids)"; //and b.type=1
+        $res = SQLManager::queryAll($sql);
+	//var_dump($res);die;
+//        $tar_arr = array();
+	$tmp = array();
+        foreach ($res as $k=>$v){
+	        $offset = array_search($v['vid'],$sort_arr);	
+            if($v['targetgroupassetid'] != '0'){
+                $tmp[$offset]['url'] = $this->getEpisodePic($v['targetgroupassetid']);
+		$tmp[$offset]['vid'] = $v['vid'];
+		$tmp[$offset]['title'] = $v['title'];
+		$tmp[$offset]['cid'] = $v['targetgroupassetid'];
+            }else{
+		$tmp[$offset]['url'] = $this->getMoviesPic($v['vid']);
+		$tmp[$offset]['vid'] = $v['vid'];
+                $tmp[$offset]['title'] = $v['title'];
+                $tmp[$offset]['cid'] = $v['targetgroupassetid'];
+	    }
+        }
+	//var_dump($tmp);
+	if(!empty($tmp)){
+		//$tmp = array_multisort($tmp);
+		/*foreach ($tmp as $k => $v) {
+			//var_dump($v);die;
+  			$edition[] = $v['vid'];
+		}
+		array_multisort($edition, SORT_ASC, $tmp);
+		var_dump($tmp);die;*/
+		echo json_encode($tmp);	
+	}else{
+        	echo json_encode($res);
+	}
+    }	
+
+    public function getEpisodePic($targetgroupassetid)
+    {
+        $sql = "select url from yd_video_pic where vid=$targetgroupassetid and type=1";//and type=1 
+        $res = SQLManager::queryRow($sql);
+        return $res['url'];
+    }	
+	
+    public function getMoviesPic($vid)
+    {
+        $sql = "select url from yd_video_pic where vid=$vid and type=1";//and type=1
+        $res = SQLManager::queryRow($sql);
+        return $res['url'];
+    }
+   
+    public function actionGwGetActorImg(){
+        $vid=$_REQUEST['vid'];
+	$res=array();
+        $result=Video::model()->findByAttributes(array("vid"=>$vid,"cp"=>"poms"));
+	if(!empty($result)){
+            $arr=array("vid"=>$result->vid,"actor"=>$result->actor);
+	}else{
+	    echo json_encode(array("error"=>-1));return;
+	}
+	if(!empty($arr['actor'])){
+            $tmp=explode("/",$arr['actor']);
+        }else{
+	    $tmp=null;
+	}
+	if(!empty($tmp)){
+ 	    for($k=0;$k<count($tmp);$k++){
+            	$list=explode("-",$tmp[$k]);
+		if(isset($list[1])){
+		  $sql="select * from yd_video_star ,yd_video_star_images where yd_video_star.starId=yd_video_star_images.starId and yd_video_star.starId=$list[1]";
+                $res[$k]=SQLManager::queryRow($sql);
+                $res[$k]['chname']=$list[0];
+		}else{
+		  echo json_encode(array("error"=>1));return;
+		}
+	    }
+	
+	//var_dump($list);die;
+	for($j=0;$j<count($res);$j++){
+	    if( isset($res[$j]['pic']) && isset($res[$j]['id'])){
+	    	$actorList[]=array("name"=>$res[$j]['chname'],"pic"=>$res[$j]['pic'],"aid"=>$res[$j]['starId']);
+	    }else{
+		$actorList[]=array("name"=>$res[$j]['chname'],"pic"=>null,"aid"=>null);
+	    }
+	}
+	}else{
+	    $actorList=array();
+	}
+	$type = $_REQUEST['type'];
+        $gw_sql = 'select name from yd_ver_station where id='.STATIONID;
+        $gw_res = SQLManager::queryRow($gw_sql);
+	//var_dump($gw_res);die;
+        $list = VerGuideManager::getStationList($gw_res['name']);
+        $tmp = VideoManager::getGwDetail($vid,$type,$list);
+        $res_gw[]=$tmp;
+	//var_dump($res_gw);die;
+	echo json_encode(array("actor"=>$actorList,"recommend"=>$tmp['recommend']));
+    }
+
+	//演员详情
+	public function actionGwActor(){
+		$aid=$_REQUEST['aid'];//演员starid
+		$tmp=VideoStarImages::model()->findByAttributes(array("starId"=>$aid));
+		$img=$tmp->pic;//演员图片
+		$model=VideoStar::model()->findByAttributes(array("starId"=>$aid));
+		$desc=$model->brief;//演员介绍
+		$name=$model->name;//演员姓名
+	        $nameEn=$model->nameEn;
+		$weight=$model->weight;
+		$tall=$model->tall;
+		$birth=$model->birth;
+		$professon=$model->professon;
+		$nation=$model->birthplace;
+		$sql="select id,vid,title,year,type,targetgroupassetid from yd_video where actor like '%$name%' and cp='poms'";
+		$list=SQLManager::queryAll($sql);
+		$result=array();
+		for($i=0;$i<count($list);$i++){
+		    if($list[$i]['targetgroupassetid']!=0){//查找相关视频
+			$result[$i]=Video::model()->findByAttributes(array("vid"=>$list[$i]['targetgroupassetid']));
+		    }else{//顶级则直接返回vid title
+			$result[$i]=array("vid"=>$list[$i]['vid'],"title"=>$list[$i]['title'],"type"=>$list[$i]['type']);
+		    }
+		}
+		foreach($result as $k=>$v){//返回所有vid 
+		    $res[]=array("vid"=>$v['vid'],"type"=>$v['type'],"title"=>$v['title']);
+		}
+		for($j=0;$j<count($res);$j++){
+			if(!empty($res[$j]['vid'])){//去除未查询到剧集的相关视频
+				$newRes[]=$res[$j];
+			}
+		}
+		//去重
+		for($k=0;$k<count($newRes);$k++){
+			$str=join(",",$newRes[$k]);
+			$temp[]=$str;
+		}
+		$temp=array_unique($temp);	
+		$variety=array();
+		$series=array();
+		$movie=array();
+		foreach($temp as $key=>$val){
+		    $tmp=explode(",",$val);
+		    $vid=$tmp[0];
+		    $title=$tmp[2];
+		    $cate=$tmp[1];
+		    $pic=VideoPic::model()->findByAttributes(array("vid"=>$vid));
+		    switch($cate){
+			case "电视剧":$series[]=array("vid"=>$vid,"cate"=>$cate,"title"=>$title,"pic"=>$pic->url);break;
+			case "综艺":$variety[]=array("vid"=>$vid,"cate"=>$cate,"title"=>$title,"pic"=>$pic->url);break;
+			case "电影":$movie[]=array("vid"=>$vid,"cate"=>$cate,"title"=>$title,"pic"=>$pic->url);break;
+		    }
+		}
+		echo json_encode(array("nation"=>$nation,"nameEn"=>$nameEn,"weight"=>$weight,"tall"=>$tall,"birth"=>$birth,"professon"=>$professon,"img"=>$img,"desc"=>$desc,"name"=>$name,"list"=>array("series"=>$series,"movie"=>$movie,"variety"=>$variety)));
+	}
+    
+}

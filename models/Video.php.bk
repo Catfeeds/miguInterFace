@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * This is the model class for table "{{video}}".
+ *
+ * The followings are the available columns in table '{{video}}':
+ * @property integer $id
+ * @property string $vid
+ * @property string $cp
+ * @property string $title
+ * @property string $info
+ * @property string $short
+ * @property string $keyword
+ * @property string $actor
+ * @property string $director
+ * @property string $language
+ * @property string $year
+ * @property string $type
+ * @property string $cate
+ * @property string $status
+ * @property integer $cTime
+ */
+class Video extends CActiveRecord
+{
+    /**
+     * @return string the associated database table name
+     */
+    public function tableName()
+    {
+        return '{{video}}';
+    }
+
+    /**
+     * @return array validation rules for model attributes.
+     */
+    public function rules()
+    {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+        return array(
+            array('cTime', 'numerical', 'integerOnly'=>true),
+            array('vid, language, type, cate', 'length', 'max'=>20),
+            array('director', 'length', 'max'=>50),
+            array('title, keyword, actor', 'length', 'max'=>150),
+            array('cp', 'length', 'max'=>15),
+            array('year', 'length', 'max'=>4),
+            array('status', 'length', 'max'=>1),
+            // The following rule is used by search().
+            // @todo Please remove those attributes that should not be searched.
+            array('id, vid, cp, title, info, short, keyword, actor, diractor, language, year, type, cate, status, cTime', 'safe', 'on'=>'search'),
+        );
+    }
+
+    /**
+     * @return array relational rules.
+     */
+    public function relations()
+    {
+        // NOTE: you may need to adjust the relation name and the related
+        // class name for the relations automatically generated below.
+        return array(
+        );
+    }
+
+    /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels()
+    {
+        return array(
+            'id' => 'ID',
+            'vid' => '视频编号',
+            'cp' => '牌照方标识',
+            'title' => '标题',
+            'info' => '简介',
+            'short' => '看点',
+            'keyword' => '关键词',
+            'actor' => '演员表',
+            'director' => '导演',
+            'language' => '语言',
+            'year' => '年代',
+            'type' => '一级分类',
+            'cate' => '二级分类',
+            'status' => '状态',
+            'cTime' => '入库时间',
+        );
+    }
+
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     *
+     * Typical usecase:
+     * - Initialize the model fields with values from filter form.
+     * - Execute this method to get CActiveDataProvider instance which will filter
+     * models according to data in model fields.
+     * - Pass data provider to CGridView, CListView or any similar widget.
+     *
+     * @return CActiveDataProvider the data provider that can return the models
+     * based on the search/filter conditions.
+     */
+    public function search()
+    {
+        // @todo Please modify the following code to remove attributes that should not be searched.
+
+        $criteria=new CDbCriteria;
+
+        $criteria->compare('id',$this->id);
+        $criteria->compare('vid',$this->vid,true);
+        $criteria->compare('cp',$this->cp,true);
+        $criteria->compare('title',$this->title,true);
+        $criteria->compare('info',$this->info,true);
+        $criteria->compare('short',$this->short,true);
+        $criteria->compare('keyword',$this->keyword,true);
+        $criteria->compare('actor',$this->actor,true);
+        $criteria->compare('director',$this->director,true);
+        $criteria->compare('language',$this->language,true);
+        $criteria->compare('year',$this->year,true);
+        $criteria->compare('type',$this->type,true);
+        $criteria->compare('cate',$this->cate,true);
+        $criteria->compare('status',$this->status,true);
+        $criteria->compare('cTime',$this->cTime);
+
+        return new CActiveDataProvider($this, array(
+            'criteria'=>$criteria,
+        ));
+    }
+
+    /**
+     * Returns the static model of the specified AR class.
+     * Please note that you should have this exact method in all your CActiveRecord descendants!
+     * @param string $className active record class name.
+     * @return Video the static model class
+     */
+    public static function model($className=__CLASS__)
+    {
+        return parent::model($className);
+    }
+}
