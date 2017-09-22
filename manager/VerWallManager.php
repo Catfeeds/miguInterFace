@@ -46,7 +46,7 @@ class VerWallManager extends WxGuide
         return $res;
     }
 
-    public static function getData($pro,$city,$usergroup,$epgcode,$cp){
+    public static function getData($pro,$city,$cp,$usergroup,$epgcode){
         $res = array();
         $time = time();
         $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
@@ -77,10 +77,11 @@ class VerWallManager extends WxGuide
         return $res;
     }
 
-    public static function getForceData($pro,$city,$usergroup,$epgcode,$cp){
+    public static function getForceData($pro,$city,$cp,$usergroup,$epgcode){
         $res = array();
         $time = time();
         $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+	//var_dump($list);die;
         if(!empty($list)){
             $gid=$list['id'];
         }else{
@@ -88,6 +89,7 @@ class VerWallManager extends WxGuide
         }
         $sql_select = "select * from yd_ver_wall";
         $sql_where = " where gid=$gid and type=1 and flag=6 and province like '%$pro%' and city like '%$city%'";
+        //$sql_where = " where gid=$gid and type=1 and flag=6";
         $sql = $sql_select . $sql_where;
         $res = SQLManager::queryAll($sql);
         return $res;

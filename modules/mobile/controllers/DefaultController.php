@@ -1491,7 +1491,7 @@ class DefaultController extends MController
         if($value===false) {
             $pro  = $_REQUEST['pro'];
             $city = $_REQUEST['city'];
-            $tmp = VerWallManager::getData($pro,$city,$usergroup,$epgcode,$cp);
+            $tmp = VerWallManager::getData($pro,$city,$cp,$usergroup,$epgcode);
             if (!empty($tmp)) {
                 foreach ($tmp as $val) {
                     $list[] = $val;
@@ -2051,17 +2051,17 @@ class DefaultController extends MController
         if($value===false) {
             $pro  = $_REQUEST['pro'];
             $city = $_REQUEST['city'];
-            $tmp = VerWallManager::getForceData($pro,$city,$usergroup,$epgcode,$cp);
+            $tmp = VerWallManager::getForceData($pro,$city,$cp,$usergroup,$epgcode);
             //var_dump($tmp);die;
             $res['err'] = $err;
             if(!empty($tmp)){
 		$res['status']=1;
-		$res['show']="";
+		//$res['show']=0;
 		for($m=0;$m<count($tmp);$m++){
-			if($tmp[$m]['endTime']<strtotime(date("Ymd",time()))||$tmp[$m]['startTime']>(strtotime(date("Ymd",time()))+86400)){
-			//$res['show']="";	
+			if($tmp[$m]['endTime']<strtotime(date("Ymd",time()))||$tmp[$m]['startTime']>(strtotime(date("Ymd",time()))+86399)){
+			$res['show']=0;	
 			}else{
-			$res['show']=$tmp[$m]['id'];
+			$res['show']=$tmp[$m]['id'];break;
 			}
 		}
                 for($i=0;$i<count($tmp);$i++){
