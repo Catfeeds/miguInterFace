@@ -2065,11 +2065,11 @@ class DefaultController extends MController
 			}
 		}
                 for($i=0;$i<count($tmp);$i++){
-                    $res['wall'][$i]=array("id"=>$tmp[$i]['id'],"title"=>$tmp[$i]['title'],"pic"=>$tmp[$i]['pic'],"thum"=>$tmp[$i]['thum'],"expiry_time"=>$tmp[$i]['startTime']."/".$tmp[$i]['endTime'],"pic_update_time"=>$tmp[$i]['pic_time']);
+                    $res['wall'][$i]=array("id"=>$tmp[$i]['id'],"title"=>$tmp[$i]['title'],"pic"=>$tmp[$i]['pic'],"thum"=>$tmp[$i]['thum'],"expiry_time"=>$tmp[$i]['startTime']."/".$tmp[$i]['endTime'],"pic_update_time"=>$tmp[$i]['pic_time'],"updatetime"=>$tmp[$i]['addTime']);
                 }
             }else{
                 $res['status'] = 0;
-		$res['show']="";
+		$res['show']=0;
                 $res['walls'] = '';
             }
 
@@ -2158,6 +2158,48 @@ class DefaultController extends MController
             $value = $data;
             Yii::app()->cache->set($cacheId, $value, CACHETIME);
             echo json_encode($value);
+        }else{
+            echo json_encode($value);
+        }
+    }
+
+    public function actionGetAddress(){
+        $err = 0;
+        if (!isset($_REQUEST['pro']) || !isset($_REQUEST['city'])){
+            $err = 1;
+            $res['err']=$err;
+            echo json_encode($res);
+            return;
+        }
+        $usergroup = isset($_REQUEST['usergroup'])?$_REQUEST['usergroup']:'';
+        $epgcode = isset($_REQUEST['epgcode'])?$_REQUEST['epgcode']:'';
+        $cp = !empty($_REQUEST['cp'])?$_REQUEST['cp']:'';
+        $cacheId = 'getaddress.html'.'?pro='.$_REQUEST['pro'].'&city='.$_REQUEST['city'].'&usergroup='.$usergroup.'&epgcode='.$epgcode.'&cp='.$cp;
+        $value=Yii::app()->cache->get($cacheId);
+        if($value===false) {
+            $pro  = $_REQUEST['pro'];
+            $city = $_REQUEST['city'];
+	    $res['error']=$err;
+            $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);//获取站点信息
+            if(!empty($list)){
+                $gid=$list['id'];
+            }else{
+                $gid = 1;
+            }
+            $sql_select = "select * from yd_ver_address";
+            $sql_where = " where stationId=$gid and province like '%$pro%' and city like '%$city%'";
+            $sql = $sql_select . $sql_where;
+            $tmp = SQLManager::queryRow($sql);
+            if(!empty($tmp)){
+                $res['web_ip']=$tmp['web_ip'];
+                $res['img_ip']=$tmp['img_ip'];
+            }else{
+                $res['web_ip']=0;
+                $res['img_ip']=0;
+            }
+            $value = $res;
+            Yii::app()->cache->set($cacheId, $value, CACHETIME);
+	    echo json_encode($value);
         }else{
             echo json_encode($value);
         }

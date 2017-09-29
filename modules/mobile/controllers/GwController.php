@@ -544,9 +544,7 @@ class GwController extends MController
                 //$sql_episode = "select  v.first_play_time,v.`order`,v.title,v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid where v.targetgroupassetid='$vid' and v.delFlag=1 and l.flag=1 group by l.assetId order by v.`order`, l.mediacoderate desc";
                 $sql_episode = "select  v.first_play_time,v.`order`,v.title,v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid where v.targetgroupassetid='$vid' and v.delFlag=1 and l.flag=1  group by l.assetId order by v.`order` desc";
             }else if($tmp['simple_set'] == '2'){
-		$sql_episode = "select  v.first_play_time,v.`order`,v.title,v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,
-l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid where v.targetgroupassetid='$vid' and v.delF
-lag=1 and l.flag=1  group by l.assetId order by v.`order` asc";
+		$sql_episode = "select  v.first_play_time,v.`order`,v.title,v.type as uType,v.vid,v.spid,v.mms_id,v.targetgroupassetid as ParentNodeID,v.year as cTime,l.cp,l.assetId,l.mediafilepath as url,l.contid as ProgramID from yd_video as v left join yd_video_list as l on v.vid=l.vid where v.targetgroupassetid='$vid' and v.delFlag=1 and l.flag=1  group by l.assetId order by v.`order` asc";
 	    }
 //        echo $sql_episode;die;
             $episode= SQLManager::queryAll($sql_episode);
