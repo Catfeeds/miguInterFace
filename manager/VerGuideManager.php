@@ -193,11 +193,13 @@ class VerGuideManager extends VerGuide{
             $logo = $list[$k]['logo'];
             $guide=$list[$k]['guide'];
             $message=$list[$k]['message'];
+            $station_id=$list[$k]['id'];
         }else{
             $gid = null;
             $logo = null;
             $guide= null;
             $message= null;
+            $station_id= null;
         }
 
         if($guide==2){//导航不显示
@@ -221,6 +223,7 @@ class VerGuideManager extends VerGuide{
         $res['tabs']=$result;
         $res['message']=$message;
         $res['guide']=$guide;
+        $res['station_id']=$station_id;
         return $res;
     }
  		
