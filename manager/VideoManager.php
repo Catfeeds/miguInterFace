@@ -180,8 +180,9 @@ class VideoManager extends Video{
                 $episode= SQLManager::queryAll($sql);
                 if(!empty($episode)){
                     foreach($episode as $k=>$v){
-                        $pa = "/<|\m3u8|ts/";
+                        $pa = "/<|\m3u8|ts|mp4/";
                         preg_match($pa, $v['url'], $match);
+			var_dump($match);die;
                         $data['episode'][$k]=$v;
                         $data['episode'][$k]['url']=$match[0];
                     }
