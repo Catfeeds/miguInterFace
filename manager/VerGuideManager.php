@@ -106,10 +106,10 @@ class VerGuideManager extends VerGuide{
             $sql_select ="select * from yd_ver_station where epgcode='$epgcode'";
             $list = SQLManager::queryAll($sql_select);
             if(empty($list)){
-                $sql_select ="select * from yd_ver_station where province like '%$pro%' and city like '%$city%' and cp like '%$cp%'";
+                $sql_select ="select * from yd_ver_station where province like '%$pro%' and city like '%$city%' and cp like '%$cp%' and CHAR_LENGTH(usergroup)=0 and CHAR_LENGTH(epgcode)=0";
                 $list = SQLManager::queryAll($sql_select);
                 if(empty($list)){
-                    $sql_select ="select * from yd_ver_station where province like '%$pro%' and city like '%0%' and cp like '%$cp%'";
+                    $sql_select ="select * from yd_ver_station where province like '%$pro%' and city like '%0%' and cp like '%$cp%' and CHAR_LENGTH(usergroup)=0 and CHAR_LENGTH(epgcode)=0";
                     $list = SQLManager::queryAll($sql_select);
                 }
             }
@@ -133,6 +133,7 @@ class VerGuideManager extends VerGuide{
                     }
                 }
             }
+		
             if(count($list)>1){
                 foreach ($list as $e=>$f){
                     if(!empty($f['province'])){
