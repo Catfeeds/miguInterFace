@@ -2068,12 +2068,25 @@ class DefaultController extends MController
                     $res['wall'][$i]=array("id"=>$tmp[$i]['id'],"title"=>$tmp[$i]['title'],"pic"=>$tmp[$i]['pic'],"thum"=>$tmp[$i]['thum'],"expiry_time"=>$tmp[$i]['startTime']."/".$tmp[$i]['endTime'],"pic_update_time"=>$tmp[$i]['pic_time'],"updatetime"=>$tmp[$i]['addTime']);
                 }
             }else{
-                $res['status'] = 0;
-		$res['show']=0;
-                $res['walls'] = '';
+                $res['status'] = 1;
+		$list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
+		$sql="select * from yd_ver_wall where gid={$list['station_id']} and flag=6 and type=1 and province like '%$pro%' and city=0";
+		$result=SQLManager::queryAll($sql);
+		if(!empty($result)){
+		for($j=0;$j<count($result);$j++){
+			if($result[$j]['endTime']<strtotime(date("Ymd",time()))||$result[$j]['startTime']>(strtotime(date("Ymd",time()))+86399)){
+				$res['show']=0;
+			}else{
+				$res['show']=$result[$j]['id'];break;
+			}
+		}
+		for($k=0;$k<count($result);$k++){
+                    $res['wall'][$k]=array("id"=>$result[$k]['id'],"title"=>$result[$k]['title'],"pic"=>$result[$k]['pic'],"thum"=>$result[$k]['thum'],"expiry_time"=>$result[$k]['startTime']."/".$result[$k]['endTime'],"pic_update_time"=>$result[$k]['pic_time'],"updatetime"=>$result[$k]['addTime']);
+                }}else{
+			$res['err']=0;
+			$res['status']=0;
+		}
             }
-
-	
 
             $value = $res;
             Yii::app()->cache->set($cacheId, $value, CACHETIME);
@@ -2180,7 +2193,7 @@ class DefaultController extends MController
             $pro  = $_REQUEST['pro'];
             $city = $_REQUEST['city'];
 	    $res['error']=$err;
-            $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);//获取站点信息
+            $list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);//获取站点信息
             if(!empty($list)){
                 $gid=$list['id'];
             }else{

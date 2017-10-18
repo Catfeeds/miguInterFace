@@ -49,9 +49,9 @@ class VerWallManager extends WxGuide
     public static function getData($pro,$city,$cp,$usergroup,$epgcode){
         $res = array();
         $time = time();
-        $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+        $list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
         if(!empty($list)){
-           $gid=$list['id'];
+           $gid=$list['station_id'];
         }else{
            $gid = 1;
         }
@@ -80,10 +80,10 @@ class VerWallManager extends WxGuide
     public static function getForceData($pro,$city,$cp,$usergroup,$epgcode){
         $res = array();
         $time = time();
-        $list = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+        $list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
 	//var_dump($list);die;
         if(!empty($list)){
-            $gid=$list['id'];
+            $gid=$list['station_id'];
         }else{
             $gid = 1;
         }
