@@ -1101,8 +1101,11 @@ class DefaultController extends MController
             $cp = $_REQUEST['cp'];
             $usergroup = $_REQUEST['usergroup'];
             $epgcode = $_REQUEST['epgcode'];
-            $tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
-            $list = VerGuideManager::getStationList($tmp['name']);
+            //$tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+            $tmp = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
+	    $name_res = VerStation::model()->findByPk($tmp['station_id']);	
+            //$list = VerGuideManager::getStationList($tmp['name']);
+            $list = VerGuideManager::getStationList($name_res->attributes['name']);
             $tmp = VideoManager::getDetail($vid,$type,$list);
             $res['content']=$tmp;
         }
@@ -1128,8 +1131,9 @@ class DefaultController extends MController
             $usergroup = $_REQUEST['usergroup'];
             $epgcode = $_REQUEST['epgcode'];
             $cp = $_REQUEST['cp'];
-            $tmp = VerGuideManager::getStation($pro, $city, $cp, $usergroup, $epgcode);
-            $list = VerSiteListManager::getStationList($tmp['name']);
+            $tmp = VerGuideManager::getData($pro, $city, $cp, $usergroup, $epgcode);
+	    $name_res = VerStation::model()->findByPk($tmp['station_id']);
+            $list = VerSiteListManager::getStationList($name->attributes['name']);
             $res['list'] = VideoManager::getSomeContent($list);
             $row = 4;
             $res['movie'] = VideoManager::getMovie($list, $row);
@@ -1161,8 +1165,9 @@ class DefaultController extends MController
             $cp = $_REQUEST['cp'];
             $epgcode = $_REQUEST['epgcode'];
             $row = 6;   //取多少条数据
-            $tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
-            $list = VerSiteListManager::getStationList($tmp['name']);
+            $tmp = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
+	    $name_res = VerStation::model()->findByPk($tmp['station_id']);	
+            $list = VerSiteListManager::getStationList($name_res->attributes['name']);
             $res['movie'] = VideoManager::getMovie($list,$row);
             if(!empty($res['movie'])){
                 $res['err'] = 0;
@@ -1195,8 +1200,9 @@ class DefaultController extends MController
             $cp = $_REQUEST['cp'];
             $epgcode = $_REQUEST['epgcode'];
 
-            $tmp = VerGuideManager::getStation($pro, $city, $cp, $usergroup, $epgcode);
-            $list = VerSiteListManager::getStationList($tmp['name']);
+            $tmp = VerGuideManager::getData($pro, $city, $cp, $usergroup, $epgcode);
+	    $name_res = VerStation::model()->findByPk($tmp['station_id']);	
+            $list = VerSiteListManager::getStationList($name_res->attributes['name']);
 
             if ($showType == '全部') {
                 $showType = '';
@@ -1225,8 +1231,9 @@ class DefaultController extends MController
         $cacheId = 'TitleSearch'.'?pro='.$_REQUEST['pro'].'&city='.$_REQUEST['city'].'&usergroup='.$_REQUEST['usergroup'].'&epgcode='.$_REQUEST['epgcode'].'&cp='.$_REQUEST['cp'].'&initial='.$initial.'&showType='.$showType.'&p='.$p;
         $value=Yii::app()->cache->get($cacheId);
         if($value===false) {
-            $tmp = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
-            $list = VerSiteListManager::getStationList($tmp['name']);
+            $tmp = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
+	    $name_res = VerStation::model()->findByPk($tmp['station_id']);	
+            $list = VerSiteListManager::getStationList($name_res->attributes['name']);
 
             if($showType == '全部' ){
                 $showType = '';
@@ -1888,9 +1895,10 @@ class DefaultController extends MController
         $cacheId = 'SearchFilter'.'?pro='.$pro.'&city='.$city.'&usergroup='.$usergroup.'&epgcode='.$epgcode.'&cp='.$cp;
         $value=Yii::app()->cache->get($cacheId);
         if($value===false) {
-           $name = VerGuideManager::getStation($pro,$city,$cp,$usergroup,$epgcode);
+           $name = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
            if(!empty($name)){
-               $gid = VerGuideManager::getStationList($name['name']);
+	       $name_res = VerStation::model()->findByPk($name['station_id']);
+               $gid = VerGuideManager::getStationList($name_res->attributes['name']);
                $gidlist = VerGuideManager::String($gid);
                $vid = $json['vid'];
                $vid = implode(',',$vid);
@@ -2195,7 +2203,7 @@ class DefaultController extends MController
 	    $res['error']=$err;
             $list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);//获取站点信息
             if(!empty($list)){
-                $gid=$list['id'];
+                $gid=$list['station_id'];
             }else{
                 $gid = 1;
             }
