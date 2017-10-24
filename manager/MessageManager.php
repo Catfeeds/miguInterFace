@@ -31,7 +31,7 @@ class MessageManager extends Message{
            $gid = 1;
         }
         $sql_select = "select * from yd_ver_message";
-        $sql_where = " where gid=$gid and $time < endTime and $time > firstTime and flag=6";
+        $sql_where = " where gid=$gid and $time < endTime and $time > firstTime and flag=6 and delFlag=0";
         $sql_order = " order by cTime desc";
         $sql = $sql_select . $sql_where . $sql_order;
 	
