@@ -56,7 +56,7 @@ class VerWallManager extends WxGuide
            $gid = 1;
         }
         $sql_select = "select * from yd_ver_wall";
-        $sql_where = " where gid=$gid and flag=6 and type=0";
+        $sql_where = " where gid=$gid and flag=6 and type=0 and delFlag=0";
         $sql = $sql_select . $sql_where; 
         $res = SQLManager::queryAll($sql);
         return $res;
@@ -88,7 +88,7 @@ class VerWallManager extends WxGuide
             $gid = 1;
         }
         $sql_select = "select * from yd_ver_wall";
-        $sql_where = " where gid=$gid and type=1 and flag=6 and province like '%$pro%' and city like '%$city%'";
+        $sql_where = " where gid=$gid and type=1 and flag=6 and delFlag=0 and province like '%$pro%' and city like '%$city%'";
         //$sql_where = " where gid=$gid and type=1 and flag=6";
         $sql = $sql_select . $sql_where;
         $res = SQLManager::queryAll($sql);
