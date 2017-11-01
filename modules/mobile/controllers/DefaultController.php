@@ -2012,6 +2012,12 @@ class DefaultController extends MController
                 $v['height'] = $v['height'];
                 $v['x'] = $v['x'];
                 $v['y'] = $v['y'];
+                if($v['width']<20){
+                    $v['width'] = $v['width']*250;
+                }
+                if($v['height']<20){
+                    $v['height'] = $v['height']*105;
+                }
                 if (empty($arr[$order])) {
                     $arr[$order]['banner'][] = $v;
                 } else {
