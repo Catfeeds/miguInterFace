@@ -2113,6 +2113,12 @@ class DefaultController extends MController
 
    public function actionGetNewEpgContent()
     {
+        /*
+         * apk定点是否需要偏移
+         * */
+        $x=110;
+        $y=70;
+
         $err = 0;
         if(!empty($_REQUEST['gid'])){
             $gid = $_REQUEST['gid'];
@@ -2157,6 +2163,10 @@ class DefaultController extends MController
                     }else{
                         $v['height'] = 105*$v['height'];
                     }
+                }
+                if($v['templateId']<=11){
+                    $v['x'] += $x;
+                    $v['y'] += $y;
                 }
 
                 if ($v['is_circular'] == '2') {//无圆角
