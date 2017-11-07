@@ -2003,8 +2003,25 @@ class DefaultController extends MController
 
             $bkimg = VerBkimg::model()->find("gid = $sid");
             $bgimg=$bkimg->url;
+
+
             foreach($data as $v){
-                $info[]=array("id"=>$v['id'],"cid"=>$v['cid'],"is_circular"=>1,"action"=>$v['action'],"param"=>$v['param'],"main_title"=>$v['title'],"type"=>$v['type'],"tType"=>$v['tType'],"uType"=>$v['uType'],"width"=>$v['width'],"height"=>$v['height'],"x"=>$v['x'],"y"=>$v['y'],"pic"=>$v['picSrc'],"order"=>$v['order'],"videoUrl"=>$v['videoUrl'],"cp"=>0);
+                if($v['template_id']<11){
+                    $circular = 0;//圆角
+                }elseif($v['template_id'] == 11){
+                    $circular = 1;
+                }else{
+                    $tmp_id = $v['template_id']-11;
+                    $tmp_sql = "select circular from yd_ver_template where id=$tmp_id";
+                    $tmp_res = SQLManager::queryRow($tmp_sql);
+                    if($tmp_res['circular'] == 1){
+                        $circular = 0;//圆角
+                    }else{
+                        $circular = 1;
+                    }
+                }
+
+                $info[]=array("id"=>$v['id'],"cid"=>$v['cid'],"is_circular"=>$circular,"action"=>$v['action'],"param"=>$v['param'],"main_title"=>$v['title'],"type"=>$v['type'],"tType"=>$v['tType'],"uType"=>$v['uType'],"width"=>$v['width'],"height"=>$v['height'],"x"=>$v['x'],"y"=>$v['y'],"pic"=>$v['picSrc'],"order"=>$v['order'],"videoUrl"=>$v['videoUrl'],"cp"=>0);
             }
             foreach ($info as $k => $v) {
                 $order = $v['order'];
@@ -2151,7 +2168,7 @@ class DefaultController extends MController
             }
             foreach ($info as $k => $v) {
                 if($v['templateId']<11){
-		    if($v['width']>1){
+		            if($v['width']>1){
                         $spacing = $v['width']-1;
                         $v['width'] = (250*$v['width'])+($spacing*20);
                     }else{
@@ -2169,11 +2186,26 @@ class DefaultController extends MController
                     $v['y'] += $y;
                 }
 
-                if ($v['is_circular'] == '2') {//无圆角
+                if($v['templateId']<11){
+                    $v['is_circular'] = 0;//圆角
+                }elseif($v['templateId'] == 11){
+                    $v['is_circular'] = 1;
+                }else{
+                    $tmp_id = $v['templateId']-11;
+                    $tmp_sql = "select circular from yd_ver_template where id=$tmp_id";
+                    $tmp_res = SQLManager::queryRow($tmp_sql);
+                    if($tmp_res['circular'] == 1){
+                        $v['is_circular'] = 0;//圆角
+                    }else{
+                        $v['is_circular'] = 1;
+                    }
+                }
+
+                /*if ($v['is_circular'] == '2') {//无圆角
                     $v['is_circular'] = 1;
                 } else {
                     $v['is_circular'] = 0;//圆角
-                }
+                }*/
                 $order = $v['order'];
                 if (empty($arr[$order])) {
                     $arr[$order]['banner'][] = $v;
