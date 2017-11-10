@@ -2134,7 +2134,7 @@ class DefaultController extends MController
          * apk定点是否需要偏移
          * */
         $x=110;
-        $y=70;
+        $y=171;
 
         $err = 0;
         if(!empty($_REQUEST['gid'])){
