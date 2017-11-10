@@ -1998,11 +1998,11 @@ class DefaultController extends MController
         $value=Yii::app()->cache->get($cacheId);
         if($value===false) {
             $sid=$_REQUEST['cid'];
-            $sql = "select * from yd_special_topic where sid=$sid order by `order` asc";
+            $sql = "select a.*,b.template_id from yd_special_topic as a inner join yd_ver_bkimg as b on a.sid=b.gid where a.sid=$sid order by a.`order` asc";
             $data = SQLManager::queryAll($sql);
 
             $bkimg = VerBkimg::model()->find("gid = $sid");
-            $bgimg=$bkimg->url;
+            $bgimg=$bkimg->attributes['url'];
 
 
             foreach($data as $v){
