@@ -2134,7 +2134,7 @@ class DefaultController extends MController
          * apk定点是否需要偏移
          * */
         $x=110;
-        $y=245;
+        $y=200;
         //$y=Yii::app()->request->getParam('y');;
 
         $err = 0;
