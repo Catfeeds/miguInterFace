@@ -1998,7 +1998,7 @@ class DefaultController extends MController
         $value=Yii::app()->cache->get($cacheId);
         if($value===false) {
             $sid=$_REQUEST['cid'];
-            $sql = "select a.*,b.template_id from yd_special_topic as a inner join yd_ver_bkimg as b on a.sid=b.gid where a.sid=$sid order by a.`order` asc";
+            $sql = "select a.*,b.template_id from yd_special_topic as a inner join yd_ver_bkimg as b on a.sid=b.gid where a.sid=$sid and a.template_id=b.template_id order by a.`order` asc";
             $data = SQLManager::queryAll($sql);
 
             $bkimg = VerBkimg::model()->find("gid = $sid");
