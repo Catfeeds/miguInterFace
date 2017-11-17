@@ -2101,7 +2101,7 @@ class DefaultController extends MController
             }else{
                 $res['status'] = 1;
 		$list = VerGuideManager::getData($pro,$city,$cp,$usergroup,$epgcode);
-		$sql="select * from yd_ver_wall where gid={$list['station_id']} and flag=6 and type=1 and province like '%$pro%' and city=0";
+		$sql="select * from yd_ver_wall where gid={$list['station_id']} and flag=6 and type=1 and province like '%$pro%' and city=0 and delFlag<1";
 		$result=SQLManager::queryAll($sql);
 		if(!empty($result)){
 		for($j=0;$j<count($result);$j++){
