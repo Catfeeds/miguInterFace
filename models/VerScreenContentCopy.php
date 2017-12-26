@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This is the model class for table "{{ver_screen_content}}".
+ * This is the model class for table "{{ver_screen_content_copy}}".
  *
- * The followings are the available columns in table '{{ver_screen_content}}':
+ * The followings are the available columns in table '{{ver_screen_content_copy}}':
  * @property integer $id
  * @property string $title
  * @property string $type
@@ -24,17 +24,20 @@
  * @property integer $delFlag
  * @property integer $order
  * @property string $uType
+ * @property string $user
+ * @property string $flag
+ * @property integer $sid
  * @property string $videoUrl
  * @property string $noSelectPic
  */
-class VerScreenContent extends CActiveRecord
+class VerScreenContentCopy extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return '{{ver_screen_content}}';
+		return '{{ver_screen_content_copy}}';
 	}
 
 	/**
@@ -45,17 +48,18 @@ class VerScreenContent extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('addTime, upTime, screenGuideid, width, height, delFlag, order', 'numerical', 'integerOnly'=>true),
+			array('addTime, upTime, screenGuideid, width, height, delFlag, order, sid', 'numerical', 'integerOnly'=>true),
 			array('title', 'length', 'max'=>300),
 			array('type, tType, uType', 'length', 'max'=>5),
 			array('param, action, pic, videoUrl, noSelectPic', 'length', 'max'=>600),
 			array('cp', 'length', 'max'=>2),
 			array('epg', 'length', 'max'=>1),
-			array('cid', 'length', 'max'=>50),
+			array('cid, user', 'length', 'max'=>50),
 			array('x, y', 'length', 'max'=>10),
+			array('flag', 'length', 'max'=>60),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, title, type, tType, param, action, pic, cp, epg, addTime, upTime, screenGuideid, cid, width, height, x, y, delFlag, order, uType, videoUrl, noSelectPic', 'safe', 'on'=>'search'),
+			array('id, title, type, tType, param, action, pic, cp, epg, addTime, upTime, screenGuideid, cid, width, height, x, y, delFlag, order, uType, user, flag, sid, videoUrl, noSelectPic', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -96,6 +100,9 @@ class VerScreenContent extends CActiveRecord
 			'delFlag' => '����״̬1����,0������',
 			'order' => 'ǰ����ʾ��������',
 			'uType' => 'U Type',
+			'user' => 'User',
+			'flag' => 'Flag',
+			'sid' => 'Sid',
 			'videoUrl' => 'Video Url',
 			'noSelectPic' => 'No Select Pic',
 		);
@@ -139,6 +146,9 @@ class VerScreenContent extends CActiveRecord
 		$criteria->compare('delFlag',$this->delFlag);
 		$criteria->compare('order',$this->order);
 		$criteria->compare('uType',$this->uType,true);
+		$criteria->compare('user',$this->user,true);
+		$criteria->compare('flag',$this->flag,true);
+		$criteria->compare('sid',$this->sid);
 		$criteria->compare('videoUrl',$this->videoUrl,true);
 		$criteria->compare('noSelectPic',$this->noSelectPic,true);
 
@@ -151,7 +161,7 @@ class VerScreenContent extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return VerScreenContent the static model class
+	 * @return VerScreenContentCopy the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
