@@ -1306,6 +1306,21 @@ class DefaultController extends MController
     foreach ($arr as $k=>$v){
         $newArr[] = $v;
     }
+
+    foreach ($newArr as $a=>$b){
+        if(count($b['banner'])>1){
+            foreach ($b['banner'] as $c=>$d){
+                $flag = 0;
+                if($d['type'] == 2){
+                    $flag = 1;
+                }
+
+                if($flag == 1 && $d['type'] !== 2){
+                    unset($newArr[$a]['banner'][$c]);
+                }
+            }
+        }
+    }
 	$data['list']=$newArr;
 
             $value = $data;
@@ -2128,7 +2143,7 @@ class DefaultController extends MController
 
     }
 
-   public function actionGetNewEpgContent()
+    public function actionGetNewEpgContent()
     {
         /*
          * apk定点是否需要偏移
@@ -2170,6 +2185,130 @@ class DefaultController extends MController
             foreach ($info as $k => $v) {
                 if($v['templateId']<11){
 		            if($v['width']>1){
+                        $spacing = $v['width']-1;
+                        $v['width'] = (250*$v['width'])+($spacing*20);
+                    }else{
+                        $v['width'] = 250*$v['width'];
+                    }
+                    if($v['height']>1){
+                        $spacing_h = $v['height']-1;
+                        $v['height'] = (105*$v['height'])+($spacing_h*20);
+                    }else{
+                        $v['height'] = 105*$v['height'];
+                    }
+                }
+                if($v['templateId']<=11){
+                    $v['x'] += $x;
+                    $v['y'] += $y;
+                }
+
+                if($v['templateId']<11){
+                    $v['is_circular'] = 0;//圆角
+                }elseif($v['templateId'] == 11){
+                    $v['is_circular'] = 1;
+                }else{
+                    $tmp_id = $v['templateId']-11;
+                    $tmp_sql = "select circular from yd_ver_template where id=$tmp_id";
+                    $tmp_res = SQLManager::queryRow($tmp_sql);
+                    if($tmp_res['circular'] == 1){
+                        $v['is_circular'] = 0;//圆角
+                    }else{
+                        $v['is_circular'] = 1;
+                    }
+                }
+
+                /*if ($v['is_circular'] == '2') {//无圆角
+                    $v['is_circular'] = 1;
+                } else {
+                    $v['is_circular'] = 0;//圆角
+                }*/
+                $order = $v['order'];
+                if (empty($arr[$order])) {
+                    $arr[$order]['banner'][] = $v;
+                } else {
+                    $tmp = $arr[$order]['banner'];
+                    $tmp[] = $v;
+                    $arr[$order]['banner'] = $tmp;
+
+                }
+                if ($v['cid'] == ' ') {
+                    $v['cid'] = '0';
+                }
+            }
+            foreach ($arr as $k=>$v){
+                $newArr[] = $v;
+            }
+
+
+            foreach ($newArr as $a=>$b){
+               if(count($b['banner'])>1){
+                   foreach ($b['banner'] as $c=>$d){
+                       $flag = 0;
+                       if($d['type'] == 2){
+                           $flag = 1;
+                       }
+
+                       if($flag == 1 && $d['type'] !== 2){
+                           unset($newArr[$a]['banner'][$c]);
+                       }
+                   }
+               }
+            }
+            $data['list']=$newArr;
+
+            $value = $data;
+            Yii::app()->cache->set($cacheId, $value, CACHETIME);
+            echo json_encode($value);
+        }else{
+            echo json_encode($value);
+        }
+    }
+
+    /**
+     * 添加了在线视频类型逻辑及推荐位图片选中和未选中逻辑
+     */
+    public function actionGetEpgContentV3()
+    {
+        /*
+         * apk定点是否需要偏移
+         * */
+        $x=110;
+        $y=200;
+        //$y=Yii::app()->request->getParam('y');;
+
+        $err = 0;
+        if(!empty($_REQUEST['gid'])){
+            $gid = $_REQUEST['gid'];
+        }else{
+            $err = '1';
+            $list['err'] = $err;
+            echo json_encode($list);
+            return;
+        }
+
+        $cacheId = 'GetEpgContentV3'.'?gid='.$_REQUEST['gid'];
+        $value=Yii::app()->cache->get($cacheId);
+        if($value===false) {
+            $sql = "select upTime from yd_ver_screen_content where `screenGuideId`=$gid group by upTime order by upTime desc";
+            $res = SQLManager::queryAll($sql);
+            $data=array();
+            if(empty($res)){
+                return null;
+            }else{
+                $data['updateTime']= $res[0]['upTime'];
+            }
+            $data['err'] = '0';
+            $info = array();
+            $sql_select="select g.templateId,c.type,c.tType, g.gid,s.circular as is_circular,c.id ,c.cp,c.cid,c.action,c.param,c.title as main_title,c.uType,c.width,c.height,c.x,c.y,c.pic,c.order,c.videoUrl,c.noSelectPic from yd_ver_screen_content c ,yd_ver_screen_guide g,yd_ver_station s";
+            $sql_where = " where `screenGuideId`=$gid and `delFlag`=0 and c.screenGuideid=g.id and g.gid=s.id order by `order`";
+            $sql = $sql_select.$sql_where;
+            $info = SQLManager::queryAll($sql);
+            if(empty($info)){
+                return null;
+            }
+            foreach ($info as $k => $v) {
+                if($v['templateId']<11){
+                    if($v['width']>1){
                         $spacing = $v['width']-1;
                         $v['width'] = (250*$v['width'])+($spacing*20);
                     }else{
