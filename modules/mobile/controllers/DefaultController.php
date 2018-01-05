@@ -2266,10 +2266,11 @@ class DefaultController extends MController
                            }
                        }
                    }
-//                   var_dump($b[''])
+                   var_dump($newArr[$a]['banner']);
                    array_merge($newArr[$a]['banner']);
                }
             }
+            die;
             $data['list']=$newArr;
 
             $value = $data;
