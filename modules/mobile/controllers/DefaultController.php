@@ -2252,6 +2252,18 @@ class DefaultController extends MController
                            unset($newArr[$a]['banner'][$c]);
                        }
                    }
+
+                   $i=0;
+                   foreach ($b['banner'] as $e=>$f){
+                       if($f['type'] == '2'){
+                           $i++;
+                       }
+
+                       if($i > 1 ){
+                           unset($newArr[$a]['banner'][$e]);
+                       }
+                   }
+
                }
             }
             $data['list']=$newArr;
