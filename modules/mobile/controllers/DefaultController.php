@@ -2266,7 +2266,8 @@ class DefaultController extends MController
                            }
                        }
                    }
-                   array_merge($b['banner']);
+//                   var_dump($b[''])
+                   array_merge($newArr[$a]['banner']);
                }
             }
             $data['list']=$newArr;
