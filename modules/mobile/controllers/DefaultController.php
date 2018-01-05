@@ -2244,11 +2244,11 @@ class DefaultController extends MController
                if(count($b['banner'])>1){
                    foreach ($b['banner'] as $c=>$d){
                        $flag = 0;
-                       if($d['type'] == 2){
+                       if($d['type'] == '2'){
                            $flag = 1;
                        }
 
-                       if($flag == 1 && $d['type'] !== 2){
+                       if($flag == 1 && $d['type'] != '2'){
                            unset($newArr[$a]['banner'][$c]);
                        }
                    }
