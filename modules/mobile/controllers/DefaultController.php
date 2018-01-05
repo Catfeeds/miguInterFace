@@ -2265,6 +2265,9 @@ class DefaultController extends MController
                            }
                        }
                    }
+                   foreach ($b['banner'] as $j=>$k){
+                       $b['banner'] = $k;
+                   }
                }
             }
             $data['list']=$newArr;
