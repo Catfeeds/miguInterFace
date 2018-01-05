@@ -2258,7 +2258,6 @@ class DefaultController extends MController
                    }else if(count($has_type)>1){
                        foreach ($un as $e=>$f){
                            unset($newArr[$a]['banner'][$e]);
-
                        }
                        foreach ($has_type as $h=>$i){
                            if($h>0){
@@ -2266,12 +2265,9 @@ class DefaultController extends MController
                            }
                        }
                    }
-                   var_dump($newArr[$a]['banner']);
                    array_merge($newArr[$a]['banner']);
-                   var_dump($newArr[$a]['banner']);
                }
             }
-            die;
             $data['list']=$newArr;
 
             $value = $data;
