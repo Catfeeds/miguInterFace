@@ -2014,7 +2014,8 @@ class DefaultController extends MController
         echo $client_ip;
    }
 
-    public function actionNewSpecial(){
+    public function actionNewSpecial()
+    {
         $err=0;
         if(empty($_REQUEST['cid'])){
             $err=1;
@@ -2024,6 +2025,114 @@ class DefaultController extends MController
         }
 
         $cacheId = 'NewSpecial'.'?cid='.$_REQUEST['cid'];
+        $value=Yii::app()->cache->get($cacheId);
+        if($value===false) {
+            $sid=$_REQUEST['cid'];
+            $sql = "select a.*,b.template_id from yd_special_topic as a inner join yd_ver_bkimg as b on a.sid=b.gid where a.sid=$sid and a.template_id=b.template_id order by a.`order` asc";
+            $data = SQLManager::queryAll($sql);
+
+            $bkimg = VerBkimg::model()->find("gid = $sid");
+            $bgimg=$bkimg->attributes['url'];
+
+
+            foreach($data as $v){
+                if($v['template_id']<11){
+                    $circular = 0;//圆角
+                }elseif($v['template_id'] == 11){
+                    $circular = 1;
+                }else{
+                    $tmp_id = $v['template_id']-11;
+                    $tmp_sql = "select circular from yd_ver_template where id=$tmp_id";
+                    $tmp_res = SQLManager::queryRow($tmp_sql);
+                    if($tmp_res['circular'] == 1){
+                        $circular = 0;//圆角
+                    }else{
+                        $circular = 1;
+                    }
+                }
+
+                $info[]=array("id"=>$v['id'],"cid"=>$v['cid'],"is_circular"=>$circular,"action"=>$v['action'],"param"=>$v['param'],"main_title"=>$v['title'],"type"=>$v['type'],"tType"=>$v['tType'],"uType"=>$v['uType'],"width"=>$v['width'],"height"=>$v['height'],"x"=>$v['x'],"y"=>$v['y'],"pic"=>$v['picSrc'],"order"=>$v['order'],"videoUrl"=>$v['videoUrl'],"cp"=>0);
+            }
+            foreach ($info as $k => $v) {
+                $order = $v['order'];
+                $v['width']  = $v['width'];
+                $v['height'] = $v['height'];
+                $v['x'] = $v['x'];
+                $v['y'] = $v['y'];
+                if($v['width']<20){
+                    $v['width'] = $v['width']*250;
+                }
+                if($v['height']<20){
+                    $v['height'] = $v['height']*105;
+                }
+                if (empty($arr[$order])) {
+                    $arr[$order]['banner'][] = $v;
+                } else {
+                    $tmp = $arr[$order]['banner'];
+                    $tmp[] = $v;
+                    $arr[$order]['banner'] = $tmp;
+                }
+                if($v['cid'] == ' '){
+                    $v['cid'] = '0';
+                }
+            }
+            foreach ($arr as $k=>$v){
+                $newArr[] = $v;
+            }
+
+            foreach ($newArr as $a=>$b){
+                if(count($b['banner'])>1){
+                    $has_type = array();
+                    $un = array();
+                    foreach ($b['banner'] as $c=>$d){
+                        if($d['type'] == '2'){
+                            $has_type[] = $c;
+                        }else{
+                            $un[] = $c;
+                        }
+                    }
+                    if(count($has_type)==1){
+                        foreach ($un as $e=>$f){
+                            unset($newArr[$a]['banner'][$e]);
+                        }
+                    }else if(count($has_type)>1){
+                        foreach ($un as $e=>$f){
+                            unset($newArr[$a]['banner'][$e]);
+                        }
+                        foreach ($has_type as $h=>$i){
+                            if($h>0){
+                                unset($newArr[$a]['banner'][$h]);
+                            }
+                        }
+                    }
+                    $newArr[$a]['banner'] = array_merge($newArr[$a]['banner']);
+                }
+            }
+
+            $res['err'] = 0;
+            $res['bgimg'] = $bgimg;
+            $res['list'] = $newArr;
+            $res['updateTime'] = 0;
+            $value = $res;
+            Yii::app()->cache->set($cacheId, $value, CACHETIME);
+            echo json_encode($value);
+        }else{
+            echo json_encode($value);
+        }
+
+    }
+
+    public function actionNewSpecialV3()
+    {
+        $err=0;
+        if(empty($_REQUEST['cid'])){
+            $err=1;
+            $res['err']=$err;
+            echo json_encode($res);
+            return;
+        }
+
+        $cacheId = 'NewSpecialV3'.'?cid='.$_REQUEST['cid'];
         $value=Yii::app()->cache->get($cacheId);
         if($value===false) {
             $sid=$_REQUEST['cid'];
