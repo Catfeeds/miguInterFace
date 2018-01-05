@@ -2242,28 +2242,29 @@ class DefaultController extends MController
 
             foreach ($newArr as $a=>$b){
                if(count($b['banner'])>1){
+                   $has_type = array();
+                   $un = array();
                    foreach ($b['banner'] as $c=>$d){
-                       $flag = 0;
                        if($d['type'] == '2'){
-                           $flag = 1;
-                       }
-
-                       if($flag == 1 && $d['type'] !== '2'){
-                           unset($newArr[$a]['banner'][$c]);
+                           $has_type[] = $c;
+                       }else{
+                           $un[] = $c;
                        }
                    }
-
-                   $i=0;
-                   foreach ($b['banner'] as $e=>$f){
-                       if($f['type'] == '2'){
-                           $i++;
-                       }
-
-                       if($i > 1 ){
+                   if(count($has_type)==1){
+                       foreach ($un as $e=>$f){
                            unset($newArr[$a]['banner'][$e]);
                        }
+                   }else if(count($has_type)>1){
+                       foreach ($un as $e=>$f){
+                           unset($newArr[$a]['banner'][$e]);
+                       }
+                       foreach ($has_type as $h=>$i){
+                           if($h>0){
+                               unset($newArr[$a]['banner'][$h]);
+                           }
+                       }
                    }
-
                }
             }
             $data['list']=$newArr;
