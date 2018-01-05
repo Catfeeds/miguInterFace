@@ -1315,7 +1315,7 @@ class DefaultController extends MController
                     $flag = 1;
                 }
 
-                if($flag == 1 && $d['type'] != 2){
+                if($flag == 1 && $d['type'] !== 2){
                     unset($newArr[$a]['banner'][$c]);
                 }
             }
@@ -2248,7 +2248,7 @@ class DefaultController extends MController
                            $flag = 1;
                        }
 
-                       if($flag == 1 && $d['type'] != 2){
+                       if($flag == 1 && $d['type'] !== 2){
                            unset($newArr[$a]['banner'][$c]);
                        }
                    }
