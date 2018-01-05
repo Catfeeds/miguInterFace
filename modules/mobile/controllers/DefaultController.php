@@ -2253,42 +2253,20 @@ class DefaultController extends MController
                    }
                    if(count($has_type)==1){
                        foreach ($un as $e=>$f){
-//                           unset($newArr[$a]['banner'][$e]);
-                           if(!array_key_exists($e, $newArr[$a]['banner'])){
-                               return $newArr[$a]['banner'];
-                           }
-                           $keys = array_keys($newArr[$a]['banner']);
-                           $index = array_search($e, $keys);
-                           if($index !== FALSE){
-                               array_splice($newArr[$a]['banner'], $index, 1);
-                           }
+                           unset($newArr[$a]['banner'][$e]);
                        }
                    }else if(count($has_type)>1){
                        foreach ($un as $e=>$f){
-//                           unset($newArr[$a]['banner'][$e]);
-                           if(!array_key_exists($e, $newArr[$a]['banner'])){
-                               return $newArr[$a]['banner'];
-                           }
-                           $keys = array_keys($newArr[$a]['banner']);
-                           $index = array_search($e, $keys);
-                           if($index !== FALSE){
-                               array_splice($newArr[$a]['banner'], $index, 1);
-                           }
+                           unset($newArr[$a]['banner'][$e]);
+
                        }
                        foreach ($has_type as $h=>$i){
                            if($h>0){
-//                               unset($newArr[$a]['banner'][$h]);
-                               if(!array_key_exists($h, $newArr[$a]['banner'])){
-                                   return $newArr[$a]['banner'];
-                               }
-                               $keys = array_keys($newArr[$a]['banner']);
-                               $index = array_search($h, $keys);
-                               if($index !== FALSE){
-                                   array_splice($newArr[$a]['banner'], $index, 1);
-                               }
+                               unset($newArr[$a]['banner'][$h]);
                            }
                        }
                    }
+                   array_values($b['banner']);
                }
             }
             $data['list']=$newArr;
