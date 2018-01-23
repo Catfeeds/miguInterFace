@@ -2299,7 +2299,7 @@ class DefaultController extends MController
             $data['err'] = '0';
             $info = array();
             $sql_select="select g.templateId,c.type,c.tType, g.gid,s.circular as is_circular,c.id ,c.cp,c.cid,c.action,c.param,c.title as main_title,c.uType,c.width,c.height,c.x,c.y,c.pic,c.order,c.videoUrl,c.noSelectPic from yd_ver_screen_content c ,yd_ver_screen_guide g,yd_ver_station s";
-            $sql_where = " where `screenGuideId`=$gid and `delFlag`=0 and c.screenGuideid=g.id and g.gid=s.id order by `order`";
+            $sql_where = " where `screenGuideId`=$gid and `delFlag`=0 and c.screenGuideid=g.id and g.gid=s.id order by c.`order`,c.id";
             $sql = $sql_select.$sql_where;
             $info = SQLManager::queryAll($sql);
             if(empty($info)){
